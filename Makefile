@@ -10,7 +10,7 @@ install:
 	pip install -e ".[dev]"
 
 download:
-	python policyengine_usk_data/data_storage/download_private_prerequisites.py
+	python policyengine_uk_data/data_storage/download_private_prerequisites.py
 
 upload:
 	python policyengine_uk_data/data_storage/upload_completed_datasets.py
