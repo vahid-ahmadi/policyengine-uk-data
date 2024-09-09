@@ -23,6 +23,7 @@ documentation:
 
 data:
 	python policyengine_uk_data/datasets/frs/dwp_frs.py
+	python policyengine_uk_data/datasets/frs/frs.py
 
 build:
 	python -m build

@@ -7,3 +7,4 @@
 **/*.zip
 !uprating_factors.csv
 !uprating_growth_factors.csv
+!statistics_by_year.csv

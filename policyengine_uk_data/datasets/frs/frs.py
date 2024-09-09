@@ -95,6 +95,7 @@ class FRS_2020_21(FRS):
     name = "frs_2020_21"
     label = "FRS (2020-21)"
     file_path = STORAGE_FOLDER / "frs_2020_21.h5"
+    time_period = 2020
 
 
 class FRS_2021_22(FRS):
@@ -102,6 +103,7 @@ class FRS_2021_22(FRS):
     name = "frs_2021_22"
     label = "FRS (2021-22)"
     file_path = STORAGE_FOLDER / "frs_2021_22.h5"
+    time_period = 2021
 
 
 class FRS_2022_23(FRS):
@@ -109,10 +111,11 @@ class FRS_2022_23(FRS):
     name = "frs_2022_23"
     label = "FRS (2022-23)"
     file_path = STORAGE_FOLDER / "frs_2022_23.h5"
+    time_period = 2022
 
 
 def add_id_variables(
-    frs: h5py.File, person: DataFrame, benunit: DataFrame, household: DataFrame
+    frs: h5py.File, person: DataFrame, household: DataFrame
 ):
     """Adds ID variables and weights.
 
@@ -145,9 +148,6 @@ def add_personal_variables(frs: h5py.File, person: DataFrame, year: int):
     frs["age"] = age
     frs["birth_year"] = np.ones_like(person.AGE) * (year - age)
     # Age fields are AGE80 (top-coded) and AGE in the adult and child tables, respectively.
-    frs["state_id"] = np.array([1])
-    frs["person_state_id"] = np.array([1] * len(person))
-    frs["state_weight"] = np.array([1])
     frs["gender"] = np.where(person.SEX == 1, "MALE", "FEMALE").astype("S")
     frs["hours_worked"] = np.maximum(person.TOTHOURS, 0) * 52
     frs["is_household_head"] = person.HRPID == 1
@@ -455,19 +455,6 @@ def add_market_income(
         )
         * 52
     )
-
-    # Discrepancy in maintenance income (UKMOD appears to use last amount rather than usual, with "not usual" answer):
-
-    INVERTED_USUAL_AMOUNT_HOUSEHOLDS = (
-        1458600,
-        1033500,
-        322100,
-        42100,
-        590400,
-        645300,
-        1901400,
-        388000,
-    )
     maintenance_to_self = max_(
         pd.Series(
             where(person.MNTUS1 == 2, person.MNTUSAM1, person.MNTAMT1)
@@ -581,14 +568,13 @@ def add_benefit_income(
         child_benefit=3,
         income_support=19,
         housing_benefit=94,
-        AA=12,
-        DLA_SC=1,
-        DLA_M=2,
-        IIDB=15,
+        attendance_allowance=12,
+        dla_sc=1,
+        dla_m=2,
+        iidb=15,
         carers_allowance=13,
-        SDA=10,
-        AFCS=8,
-        maternity_allowance=21,
+        sda=10,
+        afcs=8,
         ssmg=22,
         pension_credit=4,
         child_tax_credit=91,
@@ -597,8 +583,8 @@ def add_benefit_income(
         winter_fuel_allowance=62,
         incapacity_benefit=17,
         universal_credit=95,
-        PIP_M=97,
-        PIP_DL=96,
+        pip_m=97,
+        pip_dl=96,
     )
 
     for benefit, code in BENEFIT_CODES.items():
@@ -611,7 +597,7 @@ def add_benefit_income(
             * 52
         )
 
-    frs["JSA_contrib_reported"] = (
+    frs["jsa_contrib_reported"] = (
         sum_to_entity(
             benefits.BENAMT
             * (benefits.VAR2.isin((1, 3)))
@@ -621,7 +607,7 @@ def add_benefit_income(
         )
         * 52
     )
-    frs["JSA_income_reported"] = (
+    frs["jsa_income_reported"] = (
         sum_to_entity(
             benefits.BENAMT
             * (benefits.VAR2.isin((2, 4)))
@@ -631,7 +617,7 @@ def add_benefit_income(
         )
         * 52
     )
-    frs["ESA_contrib_reported"] = (
+    frs["esa_contrib_reported"] = (
         sum_to_entity(
             benefits.BENAMT
             * (benefits.VAR2.isin((1, 3)))
@@ -641,7 +627,7 @@ def add_benefit_income(
         )
         * 52
     )
-    frs["ESA_income_reported"] = (
+    frs["esa_income_reported"] = (
         sum_to_entity(
             benefits.BENAMT
             * (benefits.VAR2.isin((2, 4)))
@@ -652,7 +638,7 @@ def add_benefit_income(
         * 52
     )
 
-    frs["BSP_reported"] = (
+    frs["bsp_reported"] = (
         sum_to_entity(
             benefits.BENAMT * (benefits.BENEFIT.isin((6, 9))),
             benefits.person_id,
@@ -663,7 +649,7 @@ def add_benefit_income(
 
     frs["winter_fuel_allowance_reported"] = (
         np.array(frs["winter_fuel_allowance_reported"]) / 52
-    )
+    ) # This is not weeklyised by default (paid once per year)
 
     frs["statutory_sick_pay"] = person.SSPADJ * 52
     frs["statutory_maternity_pay"] = person.SMPADJ * 52
