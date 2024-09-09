@@ -97,6 +97,7 @@ class DWP_FRS_2020_21(DWP_FRS):
     name = "dwp_frs_2020_21"
     label = "DWP FRS (2020-21)"
     file_path = STORAGE_FOLDER / "dwp_frs_2020_21.h5"
+    time_period = 2020
 
 
 class DWP_FRS_2021_22(DWP_FRS):
@@ -104,6 +105,7 @@ class DWP_FRS_2021_22(DWP_FRS):
     name = "dwp_frs_2021_22"
     label = "DWP FRS (2021-22)"
     file_path = STORAGE_FOLDER / "dwp_frs_2021_22.h5"
+    time_period = 2021
 
 
 class DWP_FRS_2022_23(DWP_FRS):
@@ -111,6 +113,7 @@ class DWP_FRS_2022_23(DWP_FRS):
     name = "dwp_frs_2022_23"
     label = "DWP FRS (2022-23)"
     file_path = STORAGE_FOLDER / "dwp_frs_2022_23.h5"
+    time_period = 2022
 
 
 if __name__ == "__main__":
