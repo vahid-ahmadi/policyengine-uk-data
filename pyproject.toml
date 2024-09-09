@@ -27,7 +27,6 @@ dependencies = [
 dev = [
     "black",
     "pytest",
-    #pe uk from branch data-update
     "policyengine_uk @ git+https://github.com/PolicyEngine/policyengine-uk.git@data-update",
     "streamlit",
 ]

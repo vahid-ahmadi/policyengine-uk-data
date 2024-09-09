@@ -66,7 +66,7 @@ class FRS(Dataset):
         dwp_frs_files.close()
 
         person = pd.concat([adult, child]).sort_index().fillna(0)
-        add_id_variables(frs, person, benunit, household)
+        add_id_variables(frs, person, household)
         add_personal_variables(frs, person, self.dwp_frs.time_period)
         add_benunit_variables(frs, benunit)
         add_household_variables(frs, household, self.dwp_frs.time_period)
@@ -131,6 +131,9 @@ def add_id_variables(
     frs["person_household_id"] = person.household_id
     frs["benunit_id"] = person.benunit_id.sort_values().unique()
     frs["household_id"] = person.household_id.sort_values().unique()
+    frs["state_id"] = np.array([1])
+    frs["person_state_id"] = np.array([1] * len(person))
+    frs["state_weight"] = np.array([1])
 
     # Add grossing weights
     frs["household_weight"] = household.GROSS4
