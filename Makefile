@@ -1,5 +1,3 @@
-.PHONY: all format test install download upload docker documentation data clean build
-
 all: data test
 
 format:
@@ -12,10 +10,10 @@ install:
 	pip install -e ".[dev]"
 
 download:
-	python policyengine_us_data/data_storage/download_private_prerequisites.py
+	python policyengine_usk_data/data_storage/download_private_prerequisites.py
 
 upload:
-	python policyengine_us_data/data_storage/upload_completed_datasets.py
+	python policyengine_uk_data/data_storage/upload_completed_datasets.py
 
 docker:
 	docker buildx build --platform linux/amd64 . -t policyengine-uk-data:latest
