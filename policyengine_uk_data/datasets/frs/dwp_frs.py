@@ -111,3 +111,8 @@ class DWP_FRS_2022_23(DWP_FRS):
     name = "dwp_frs_2022_23"
     label = "DWP FRS (2022-23)"
     file_path = STORAGE_FOLDER / "dwp_frs_2022_23.h5"
+
+if __name__ == "__main__":
+    DWP_FRS_2020_21().generate()
+    DWP_FRS_2021_22().generate()
+    DWP_FRS_2022_23().generate()

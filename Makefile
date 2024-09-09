@@ -22,7 +22,7 @@ documentation:
 	streamlit run docs/Home.py
 
 data:
-	echo "Nothing right now."
+	python policyengine_uk_data/datasets/frs/dwp_frs.py
 
 build:
 	python -m build
