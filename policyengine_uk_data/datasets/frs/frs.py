@@ -114,9 +114,7 @@ class FRS_2022_23(FRS):
     time_period = 2022
 
 
-def add_id_variables(
-    frs: h5py.File, person: DataFrame, household: DataFrame
-):
+def add_id_variables(frs: h5py.File, person: DataFrame, household: DataFrame):
     """Adds ID variables and weights.
 
     Args:
@@ -652,7 +650,7 @@ def add_benefit_income(
 
     frs["winter_fuel_allowance_reported"] = (
         np.array(frs["winter_fuel_allowance_reported"]) / 52
-    ) # This is not weeklyised by default (paid once per year)
+    )  # This is not weeklyised by default (paid once per year)
 
     frs["statutory_sick_pay"] = person.SSPADJ * 52
     frs["statutory_maternity_pay"] = person.SMPADJ * 52
