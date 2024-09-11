@@ -247,7 +247,7 @@ def create_target_matrix(
 
 
 def get_loss_results(dataset, time_period, reform=None):
-    matrix, targets = create_target_matrix(dataset, time_period)
+    matrix, targets = create_target_matrix(dataset, time_period, reform)
     weights = (
         Microsimulation(dataset=dataset, reform=reform)
         .calculate("household_weight", time_period)

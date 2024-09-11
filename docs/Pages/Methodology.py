@@ -4,6 +4,7 @@ from policyengine_uk_data.utils import get_loss_results
 from policyengine_uk_data import FRS_2022_23
 from policyengine_core.model_api import Reform
 import plotly.express as px
+import pandas as pd
 
 st.title("Methodology")
 
@@ -42,7 +43,7 @@ The table below shows the result, and: it's really quite bad! Look at the relati
 def get_original_frs_loss():
     use_reported = Reform.from_dict(
         {
-            "gov.contrib.policyengine.disable_simulated_benefits": False,
+            "gov.contrib.policyengine.disable_simulated_benefits": True,
         }
     )
 
@@ -61,7 +62,7 @@ def get_original_frs_loss():
     return loss_results
 
 
-loss_results = get_original_frs_loss()
+loss_results = get_original_frs_loss().copy()
 with st.expander(expanded=True, label="Objective function deep dive"):
     st.dataframe(loss_results, use_container_width=True)
 
@@ -128,3 +129,56 @@ with st.expander(expanded=True, label="Incomes agains ground truth"):
         barmode="group",
     )
     st.plotly_chart(fig, use_container_width=True)
+
+st.write("OK, so what can we do about it?")
+
+st.subheader("FRS (+ tax-benefit model)")
+
+st.write(
+    "First, let's turn on the model and check nothing unexpected happens."
+)
+
+
+@st.cache_data
+def get_frs_loss():
+    loss_results = get_loss_results(FRS_2022_23, "2022")
+
+    def get_type(name):
+        if "hmrc" in name:
+            return "Income"
+        if "ons" in name:
+            return "Demographics"
+        if "obr" in name:
+            return "Tax-benefit"
+        return "Other"
+
+    loss_results["type"] = loss_results.name.apply(get_type)
+    return loss_results
+
+
+original_frs_loss = loss_results.copy()
+frs_loss = get_frs_loss().copy()
+combined_frs_loss = pd.merge(
+    on="name",
+    left=original_frs_loss,
+    right=frs_loss,
+    suffixes=("_original", "_simulated"),
+)
+combined_frs_loss["change_in_abs_rel_error"] = (
+    combined_frs_loss["abs_rel_error_simulated"]
+    - combined_frs_loss["abs_rel_error_original"]
+)
+# Sort columns
+combined_frs_loss.sort_index(axis=1, inplace=True)
+combined_frs_loss = combined_frs_loss.set_index("name").sort_values(
+    "change_in_abs_rel_error"
+)
+
+st.dataframe(combined_frs_loss, use_container_width=True)
+
+st.write(
+    """Again, a few notes:
+         
+* You might be thinking: 'why do some of the HMRC income statistics change?'. That's because of the State Pension, which is simulated in the model. The State Pension is a component of total income, so people might be moved from one income band to another if we adjust their State Pension payments slightly.
+"""
+)
