@@ -71,7 +71,7 @@ for column in income:
 import numpy as np
 
 income["total_income_lower_bound"] = list(income["income_range"][:-1]) + [
-    -np.inf
+    12_570
 ]
 income["total_income_upper_bound"] = (
     list(income["income_range"][1:-1]) + [np.inf] * 2

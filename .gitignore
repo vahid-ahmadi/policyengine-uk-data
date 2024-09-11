@@ -7,4 +7,6 @@
 **/*.zip
 !uprating_factors.csv
 !uprating_growth_factors.csv
-!statistics_by_year.csv
+!incomes.csv
+!tax_benefit.csv
+!demographics.csv

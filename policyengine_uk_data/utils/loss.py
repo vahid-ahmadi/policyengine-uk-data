@@ -3,22 +3,24 @@ from policyengine_uk import Microsimulation
 import pandas as pd
 from policyengine_uk_data.storage import STORAGE_FOLDER
 
-df = pd.read_csv(STORAGE_FOLDER / "statistics_by_year.csv")
+tax_benefit = pd.read_csv(STORAGE_FOLDER / "tax_benefit.csv")
+demographics = pd.read_csv(STORAGE_FOLDER / "demographics.csv")
+statistics = pd.concat([tax_benefit, demographics])
 dfs = []
 
 MIN_YEAR = 2018
 MAX_YEAR = 2029
 
 for time_period in range(MIN_YEAR, MAX_YEAR + 1):
-    time_period_df = df[
+    time_period_df = statistics[
         ["name", "unit", "reference", str(time_period)]
     ].rename(columns={str(time_period): "value"})
     time_period_df["time_period"] = time_period
     dfs.append(time_period_df)
 
-main_df = pd.concat(dfs)
-main_df = main_df[main_df.value.notnull()]
-main_df.to_csv("statistics.csv", index=False)
+statistics = pd.concat(dfs)
+statistics = statistics[statistics.value.notnull()]
+
 
 
 def create_target_matrix(
@@ -31,6 +33,8 @@ def create_target_matrix(
     A * w = b
 
     """
+
+    # First- tax-benefit outcomes from the DWP and OBR.
 
     sim = Microsimulation(dataset=dataset)
     sim.default_calculation_period = time_period
@@ -63,16 +67,16 @@ def create_target_matrix(
     df["attendance_allowance"] = pe("attendance_allowance")
     df["carers_allowance"] = pe("carers_allowance")
     df["dla"] = pe("dla")
-    df["esa"] = pe("ESA_income") + pe("ESA_contrib")
-    df["esa_contrib"] = pe("ESA_contrib")
-    df["esa_income"] = pe("ESA_income")
+    df["esa"] = pe("esa_income") + pe("esa_contrib")
+    df["esa_contrib"] = pe("esa_contrib")
+    df["esa_income"] = pe("esa_income")
     df["housing_benefit"] = pe("housing_benefit")
     df["pip"] = pe("pip")
-    df["statutory_maternity_pay"] = pe("SMP")
+    df["statutory_maternity_pay"] = pe("statutory_maternity_pay")
     df["attendance_allowance_count"] = pe_count("attendance_allowance")
     df["carers_allowance_count"] = pe_count("carers_allowance")
     df["dla_count"] = pe_count("dla")
-    df["esa_count"] = pe_count("ESA_income", "ESA_contrib")
+    df["esa_count"] = pe_count("esa_income", "esa_contrib")
     df["housing_benefit_count"] = pe_count("housing_benefit")
     df["pension_credit_count"] = pe_count("pension_credit")
     df["pip_count"] = pe_count("pip")
@@ -87,7 +91,7 @@ def create_target_matrix(
         on_uc * ~unemployed
     )
 
-    df["winter_fuel_payment_count"] = pe_count("winter_fuel_allowance")
+    df["winter_fuel_allowance_count"] = pe_count("winter_fuel_allowance")
     df["capital_gains_tax"] = pe("capital_gains_tax")
     df["child_benefit"] = pe("child_benefit")
 
@@ -101,7 +105,7 @@ def create_target_matrix(
     df["domestic_rates"] = pe("domestic_rates")
     df["fuel_duties"] = pe("fuel_duty")
     df["income_tax"] = pe("income_tax")
-    df["jobseekers_allowance"] = pe("JSA_income") + pe("JSA_contrib")
+    df["jobseekers_allowance"] = pe("jsa_income") + pe("jsa_contrib")
     df["pension_credit"] = pe("pension_credit")
     df["stamp_duty_land_tax"] = pe("expected_sdlt")
     df["state_pension"] = pe("state_pension")
@@ -116,7 +120,9 @@ def create_target_matrix(
     )
 
     df["vat"] = pe("vat")
-    df["winter_fuel_payment"] = pe("winter_fuel_allowance")
+    df["winter_fuel_allowance"] = pe("winter_fuel_allowance")
+
+    # Population statistics from the ONS.
 
     region = sim.calculate("region", map_to="person")
     region_to_target_name_map = {
@@ -168,10 +174,12 @@ def create_target_matrix(
         ],
     )
 
-    targets
+    # Finally, incomes from HMRC
 
     return df, targets.value
 
-
-matrix, targets = create_target_matrix("frs_2022", "2022")
+from policyengine_uk_data import FRS_2022_23
+matrix, targets = create_target_matrix(FRS_2022_23, "2022")
 target_names = matrix.columns
+
+matrix
