@@ -41,6 +41,7 @@ def save_imputation_models():
     vat.train(etb[PREDICTORS], etb[IMPUTATIONS])
     vat.save(STORAGE_FOLDER / "vat.pkl")
 
+
 def create_vat_model(overwrite_existing: bool = False):
     if (STORAGE_FOLDER / "vat.pkl").exists() and not overwrite_existing:
         return

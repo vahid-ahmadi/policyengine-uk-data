@@ -146,9 +146,8 @@ def save_imputation_models():
         was[PREDICTOR_VARIABLES],
         was[IMPUTE_VARIABLES],
     )
-    wealth.save(
-        STORAGE_FOLDER / "wealth.pkl"
-    )
+    wealth.save(STORAGE_FOLDER / "wealth.pkl")
+
 
 def create_wealth_model(overwrite_existing: bool = False):
     if (STORAGE_FOLDER / "wealth.pkl").exists() and not overwrite_existing:

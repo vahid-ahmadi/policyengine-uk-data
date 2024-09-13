@@ -24,8 +24,6 @@ for time_period in range(MIN_YEAR, MAX_YEAR + 1):
 statistics = pd.concat(dfs)
 statistics = statistics[statistics.value.notnull()]
 
-incomes = pd.read_csv(STORAGE_FOLDER / "incomes.csv")
-
 
 def create_target_matrix(
     dataset: str,
@@ -197,6 +195,8 @@ def create_target_matrix(
     ]
 
     income_df = sim.calculate_dataframe(["total_income"] + INCOME_VARIABLES)
+
+    incomes = pd.read_csv(STORAGE_FOLDER / "incomes.csv")
     for variable in INCOME_VARIABLES:
         incomes[variable + "_count"] = uprate_values(
             incomes[variable + "_count"], "household_weight", 2021, time_period

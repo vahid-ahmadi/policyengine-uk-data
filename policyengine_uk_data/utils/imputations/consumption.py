@@ -152,8 +152,11 @@ def save_imputation_models():
         STORAGE_FOLDER / "consumption.pkl",
     )
 
+
 def create_consumption_model(overwrite_existing: bool = False):
-    if (STORAGE_FOLDER / "consumption.pkl").exists() and not overwrite_existing:
+    if (
+        STORAGE_FOLDER / "consumption.pkl"
+    ).exists() and not overwrite_existing:
         return
     save_imputation_models()
 

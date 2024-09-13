@@ -1,9 +1,14 @@
 import streamlit as st
-# Wide
+
 st.set_page_config(layout="wide")
 
 from policyengine_uk_data.utils import get_loss_results
-from policyengine_uk_data import FRS_2022_23, ExtendedFRS_2022_23
+from policyengine_uk_data import (
+    FRS_2022_23,
+    ExtendedFRS_2022_23,
+    EnhancedFRS_2022_23,
+    ReweightedFRS_2022_23,
+)
 from policyengine_core.model_api import Reform
 import plotly.express as px
 import pandas as pd
@@ -57,12 +62,15 @@ def get_loss(dataset, reform, time_period):
     loss_results["type"] = loss_results.name.apply(get_type)
     return loss_results
 
+
 reported_benefits = Reform.from_dict(
     {
         "gov.contrib.policyengine.disable_simulated_benefits": True,
     }
 )
-loss_results = get_loss(dataset=FRS_2022_23, reform=reported_benefits, time_period=2022).copy()
+loss_results = get_loss(
+    dataset=FRS_2022_23, reform=reported_benefits, time_period=2022
+).copy()
 with st.expander(expanded=True, label="Objective function deep dive"):
     st.dataframe(loss_results, use_container_width=True)
 
@@ -82,8 +90,7 @@ fig = px.histogram(
     color="type",
 )
 
-with st.expander(expanded=True, label="Errors by category"):
-    st.plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig, use_container_width=True)
 
 st.write(
     """A few notes:
@@ -95,46 +102,43 @@ st.write(
 """
 )
 
-with st.expander(expanded=True, label="Incomes against ground truth"):
-    incomes = loss_results[loss_results.type == "Income"]
-    incomes["band"] = incomes.name.apply(
-        lambda x: x.split("band_")[1].split("_")[0]
-    ).astype(int)
-    incomes["count"] = incomes.name.apply(lambda x: "count" in x)
-    incomes["variable"] = incomes.name.apply(
-        lambda x: x.split("_income_band")[0]
-        .split("_count")[0]
-        .split("hmrc/")[-1]
-    )
+incomes = loss_results[loss_results.type == "Income"]
+incomes["band"] = incomes.name.apply(
+    lambda x: x.split("band_")[1].split("_")[0]
+).astype(int)
+incomes["count"] = incomes.name.apply(lambda x: "count" in x)
+incomes["variable"] = incomes.name.apply(
+    lambda x: x.split("_income_band")[0].split("_count")[0].split("hmrc/")[-1]
+)
 
-    variable = st.selectbox(
-        "Select income variable", incomes.variable.unique()
-    )
-    count = st.checkbox("Count")
-    variable_df = incomes[
-        (incomes.variable == variable) & (incomes["count"] == count)
-    ]
+variable = st.selectbox("Select income variable", incomes.variable.unique())
+count = st.checkbox("Count")
+variable_df = incomes[
+    (incomes.variable == variable) & (incomes["count"] == count)
+]
 
-    fig = px.bar(
-        variable_df,
-        x="band",
-        y=[
-            "target",
-            "estimate",
-            "error",
-            "rel_error",
-            "abs_error",
-            "abs_rel_error",
-        ],
-        barmode="group",
-    )
-    st.plotly_chart(fig, use_container_width=True)
+fig = px.bar(
+    variable_df,
+    x="band",
+    y=[
+        "target",
+        "estimate",
+        "error",
+        "rel_error",
+        "abs_error",
+        "abs_rel_error",
+    ],
+    barmode="group",
+)
+st.plotly_chart(fig, use_container_width=True)
 
-    st.write("""There are a few interesting things here:
+st.write(
+    """There are a few interesting things here:
              
 * The FRS over-estimates incomes in the upper-middle of the distribution and under-estimates them in the top of the distribution. The reason for this is probably: the FRS misses out the top completely, and then because of the weight optimisation (which scales up the working-age age groups to hit their population targets), the middle of the distribution is inflated, overcompensating.
 * Some income types are severely under-estimated across all bands: notably capital incomes. This probably reflects issues with the survey questionnaire design more than sampling bias.
-""")
+"""
+)
 st.write("OK, so what can we do about it?")
 
 st.subheader("FRS (+ tax-benefit model)")
@@ -160,21 +164,115 @@ combined_frs_loss["change_in_abs_rel_error"] = (
 combined_frs_loss.sort_index(axis=1, inplace=True)
 combined_frs_loss = combined_frs_loss.set_index("name")
 
-with st.expander(expanded=True, label="Objective function deep dive"):
-    st.dataframe(combined_frs_loss, use_container_width=True)
+st.dataframe(combined_frs_loss, use_container_width=True)
 
-    st.write(
-        """Again, a few notes:
-            
+st.write(
+    """Again, a few notes:
+        
 * You might be thinking: 'why do some of the HMRC income statistics change?'. That's because of the State Pension, which is simulated in the model. The State Pension is a component of total income, so people might be moved from one income band to another if we adjust their State Pension payments slightly.
 * Some of the tax-benefit statistics change, and get better and worse. This is expected for a variety of reasons- one is that incomes and benefits are often out of sync with each other in the data (the income in the survey week might not match income in the benefits assessment time period).
-    """
-    )
+"""
+)
 
 st.subheader("Adding imputations")
 
-st.write("Now, let's add in the imputations for wealth and consumption.")
+st.write(
+    """Now, let's add in the imputations for wealth and consumption. For this, we train *quantile regression forests* (essentially, random forest models that capture the conditional distribution of the data) to predict wealth and consumption variables from FRS-shared variables in other surveys.
+
+The datasets we use are:
+* The Wealth and Assets Survey (WAS) for wealth imputations.
+* The Living Costs and Food Survey (LCFS) for most consumption imputations.      
+* The Effects of Taxes and Benefits on Household Income (ETB) for '£ consumption that is full VAT rateable'. For example, different households will have different profiles in terms of the share of their consumption that falls on the VATable items.
+         
+Below is a table showing how just adding these imputations changes our objective statistics (filtered to just rows which changed). Not bad pre-calibrated performance! And we've picked up an extra £200bn in taxes.
+"""
+)
 
 new_loss = get_loss(ExtendedFRS_2022_23, None, 2022).copy()
+new_loss_against_old = pd.merge(
+    on="name",
+    left=frs_loss,
+    right=new_loss,
+    suffixes=("_simulated", "_imputed"),
+)
+new_loss_against_old["change_in_abs_rel_error"] = (
+    new_loss_against_old["abs_rel_error_imputed"]
+    - new_loss_against_old["abs_rel_error_simulated"]
+)
 
-st.dataframe(new_loss)
+st.dataframe(
+    new_loss_against_old[
+        new_loss_against_old.change_in_abs_rel_error.abs() > 0.01
+    ]
+)
+
+st.subheader("Calibration")
+
+st.write(
+    "Now, we've got a dataset that's performs pretty well without explicitly targeting the official statistics we care about. So it's time to add the final touch- calibrating the weights to explicitly minimise error against the target set."
+)
+
+calibrated_loss = get_loss(ReweightedFRS_2022_23, None, 2022).copy()
+calibrated_loss_against_imputed = pd.merge(
+    on="name",
+    left=new_loss,
+    right=calibrated_loss,
+    suffixes=("_imputed", "_calibrated"),
+)
+
+calibrated_loss_against_imputed["change_in_abs_rel_error"] = (
+    calibrated_loss_against_imputed["abs_rel_error_calibrated"]
+    - calibrated_loss_against_imputed["abs_rel_error_imputed"]
+)
+
+st.dataframe(calibrated_loss_against_imputed)
+
+st.write(
+    "The above table shows what this did to our target set. Mostly, we're hitting targets! But we are still under on income tax and many of the highest income band statistics. Let's take another look at the incomes, but with this new calibrated dataset."
+)
+
+incomes = calibrated_loss[loss_results.type == "Income"]
+incomes["band"] = incomes.name.apply(
+    lambda x: x.split("band_")[1].split("_")[0]
+).astype(int)
+incomes["count"] = incomes.name.apply(lambda x: "count" in x)
+incomes["variable"] = incomes.name.apply(
+    lambda x: x.split("_income_band")[0].split("_count")[0].split("hmrc/")[-1]
+)
+
+variable = st.selectbox(
+    "Select income variable",
+    incomes.variable.unique(),
+    key=1,
+)
+count = st.checkbox("Count", key=2)
+variable_df = incomes[
+    (incomes.variable == variable) & (incomes["count"] == count)
+]
+
+fig = px.bar(
+    variable_df,
+    x="band",
+    y=[
+        "target",
+        "estimate",
+        "error",
+        "rel_error",
+        "abs_error",
+        "abs_rel_error",
+    ],
+    barmode="group",
+)
+st.plotly_chart(fig, use_container_width=True)
+
+st.write(
+    """
+So, what's happening here seems like: the FRS just doesn't have enough high-income records for calibration to work straight away. The optimiser can't just set really high weights for the few rich people we do have, because it'd hurt performance on the demographic statistics.
+         
+So, we need a solution to add more high-income records. What we'll do is:
+         
+* Train a QRF model to predict the distributions of income variables from the Survey of Personal Incomes from FRS demographic variables.
+* For each FRS person, add an 'imputed income' clone with zero weight.
+* Run the calibration again.
+"""
+)
