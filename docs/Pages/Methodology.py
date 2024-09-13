@@ -1,7 +1,9 @@
 import streamlit as st
+# Wide
+st.set_page_config(layout="wide")
 
 from policyengine_uk_data.utils import get_loss_results
-from policyengine_uk_data import FRS_2022_23
+from policyengine_uk_data import FRS_2022_23, ExtendedFRS_2022_23
 from policyengine_core.model_api import Reform
 import plotly.express as px
 import pandas as pd
@@ -40,14 +42,8 @@ The table below shows the result, and: it's really quite bad! Look at the relati
 
 
 @st.cache_data
-def get_original_frs_loss():
-    use_reported = Reform.from_dict(
-        {
-            "gov.contrib.policyengine.disable_simulated_benefits": True,
-        }
-    )
-
-    loss_results = get_loss_results(FRS_2022_23, "2022", use_reported)
+def get_loss(dataset, reform, time_period):
+    loss_results = get_loss_results(dataset, time_period, reform)
 
     def get_type(name):
         if "hmrc" in name:
@@ -61,8 +57,12 @@ def get_original_frs_loss():
     loss_results["type"] = loss_results.name.apply(get_type)
     return loss_results
 
-
-loss_results = get_original_frs_loss().copy()
+reported_benefits = Reform.from_dict(
+    {
+        "gov.contrib.policyengine.disable_simulated_benefits": True,
+    }
+)
+loss_results = get_loss(dataset=FRS_2022_23, reform=reported_benefits, time_period=2022).copy()
 with st.expander(expanded=True, label="Objective function deep dive"):
     st.dataframe(loss_results, use_container_width=True)
 
@@ -95,7 +95,7 @@ st.write(
 """
 )
 
-with st.expander(expanded=True, label="Incomes agains ground truth"):
+with st.expander(expanded=True, label="Incomes against ground truth"):
     incomes = loss_results[loss_results.type == "Income"]
     incomes["band"] = incomes.name.apply(
         lambda x: x.split("band_")[1].split("_")[0]
@@ -130,6 +130,11 @@ with st.expander(expanded=True, label="Incomes agains ground truth"):
     )
     st.plotly_chart(fig, use_container_width=True)
 
+    st.write("""There are a few interesting things here:
+             
+* The FRS over-estimates incomes in the upper-middle of the distribution and under-estimates them in the top of the distribution. The reason for this is probably: the FRS misses out the top completely, and then because of the weight optimisation (which scales up the working-age age groups to hit their population targets), the middle of the distribution is inflated, overcompensating.
+* Some income types are severely under-estimated across all bands: notably capital incomes. This probably reflects issues with the survey questionnaire design more than sampling bias.
+""")
 st.write("OK, so what can we do about it?")
 
 st.subheader("FRS (+ tax-benefit model)")
@@ -139,25 +144,8 @@ st.write(
 )
 
 
-@st.cache_data
-def get_frs_loss():
-    loss_results = get_loss_results(FRS_2022_23, "2022")
-
-    def get_type(name):
-        if "hmrc" in name:
-            return "Income"
-        if "ons" in name:
-            return "Demographics"
-        if "obr" in name:
-            return "Tax-benefit"
-        return "Other"
-
-    loss_results["type"] = loss_results.name.apply(get_type)
-    return loss_results
-
-
 original_frs_loss = loss_results.copy()
-frs_loss = get_frs_loss().copy()
+frs_loss = get_loss(FRS_2022_23, None, 2022).copy()
 combined_frs_loss = pd.merge(
     on="name",
     left=original_frs_loss,
@@ -170,15 +158,23 @@ combined_frs_loss["change_in_abs_rel_error"] = (
 )
 # Sort columns
 combined_frs_loss.sort_index(axis=1, inplace=True)
-combined_frs_loss = combined_frs_loss.set_index("name").sort_values(
-    "change_in_abs_rel_error"
-)
+combined_frs_loss = combined_frs_loss.set_index("name")
 
-st.dataframe(combined_frs_loss, use_container_width=True)
+with st.expander(expanded=True, label="Objective function deep dive"):
+    st.dataframe(combined_frs_loss, use_container_width=True)
 
-st.write(
-    """Again, a few notes:
-         
+    st.write(
+        """Again, a few notes:
+            
 * You might be thinking: 'why do some of the HMRC income statistics change?'. That's because of the State Pension, which is simulated in the model. The State Pension is a component of total income, so people might be moved from one income band to another if we adjust their State Pension payments slightly.
-"""
-)
+* Some of the tax-benefit statistics change, and get better and worse. This is expected for a variety of reasons- one is that incomes and benefits are often out of sync with each other in the data (the income in the survey week might not match income in the benefits assessment time period).
+    """
+    )
+
+st.subheader("Adding imputations")
+
+st.write("Now, let's add in the imputations for wealth and consumption.")
+
+new_loss = get_loss(ExtendedFRS_2022_23, None, 2022).copy()
+
+st.dataframe(new_loss)

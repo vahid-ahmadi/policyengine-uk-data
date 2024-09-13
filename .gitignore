@@ -5,6 +5,7 @@
 *.ipynb
 **/*.csv
 **/*.zip
+**/*.pkl
 !uprating_factors.csv
 !uprating_growth_factors.csv
 !incomes.csv
