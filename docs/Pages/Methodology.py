@@ -276,3 +276,55 @@ So, we need a solution to add more high-income records. What we'll do is:
 * Run the calibration again.
 """
 )
+
+st.subheader("The Enhanced FRS")
+
+efrs_loss = get_loss(EnhancedFRS_2022_23, None, 2022).copy()
+efrs_loss_against_calibrated = pd.merge(
+    on="name",
+    left=calibrated_loss,
+    right=efrs_loss,
+    suffixes=("_calibrated", "_enhanced"),
+)
+efrs_loss_against_calibrated["change_in_abs_rel_error"] = (
+    efrs_loss_against_calibrated["abs_rel_error_enhanced"]
+    - efrs_loss_against_calibrated["abs_rel_error_calibrated"]
+)
+
+st.dataframe(efrs_loss_against_calibrated)
+
+# And let's see the incomes again.
+
+incomes = efrs_loss[efrs_loss.type == "Income"]
+incomes["band"] = incomes.name.apply(
+    lambda x: x.split("band_")[1].split("_")[0]
+).astype(int)
+incomes["count"] = incomes.name.apply(lambda x: "count" in x)
+incomes["variable"] = incomes.name.apply(
+    lambda x: x.split("_income_band")[0].split("_count")[0].split("hmrc/")[-1]
+)
+
+variable = st.selectbox(
+    "Select income variable",
+    incomes.variable.unique(),
+    key=3,
+)
+count = st.checkbox("Count", key=4)
+variable_df = incomes[
+    (incomes.variable == variable) & (incomes["count"] == count)
+]
+fig = px.bar(
+    variable_df,
+    x="band",
+    y=[
+        "target",
+        "estimate",
+        "error",
+        "rel_error",
+        "abs_error",
+        "abs_rel_error",
+    ],
+    barmode="group",
+)
+
+st.plotly_chart(fig, use_container_width=True)

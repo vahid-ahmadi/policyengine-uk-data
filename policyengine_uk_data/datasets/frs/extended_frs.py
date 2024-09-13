@@ -69,13 +69,11 @@ class ExtendedFRS(Dataset):
         )
         create_income_model()
         income = Imputation.load(STORAGE_FOLDER / "income.pkl")
-        full_imputations = income.predict(income_inputs)
+        full_imputations = income.predict(income_inputs, mean_quantile=0.8)
         for variable in full_imputations.columns:
             # Assign over the second half of the dataset
             if variable in new_data.keys():
-                new_data[variable][str(self.time_period)][
-                    len(new_data[variable]) // 2 :
-                ] = full_imputations[variable].values
+                new_data[variable][str(self.time_period)] = list(data[variable][str(self.time_period)]) + list(full_imputations[variable].values)
             else:
                 new_data[variable] = {
                     str(self.time_period): list(
