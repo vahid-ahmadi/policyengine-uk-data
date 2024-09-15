@@ -1,4 +1,5 @@
 from .frs import *
+from .spi import *
 
 DATASETS = [
     FRS_2020_21,

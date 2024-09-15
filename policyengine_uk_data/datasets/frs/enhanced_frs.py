@@ -10,7 +10,7 @@ import torch
 class EnhancedFRS(Dataset):
     def generate(self):
         data = self.input_frs().load_dataset()
-        original_weights = data["household_weight"][str(self.time_period)] + 1
+        original_weights = data["household_weight"][str(self.time_period)] + 10
         for year in range(self.time_period, self.end_year + 1):
             loss_matrix, targets_array = create_target_matrix(
                 self.input_frs, year
@@ -71,7 +71,7 @@ def reweight(
             raise ValueError("Relative error contains NaNs")
         return rel_error.mean()
 
-    optimizer = torch.optim.Adam([weights], lr=1e-2)
+    optimizer = torch.optim.Adam([weights], lr=1e-1)
     from tqdm import trange
 
     iterator = trange(1_000)

@@ -144,7 +144,6 @@ def create_target_matrix(
         "NORTHERN_IRELAND": "northern_ireland",
     }
     age = sim.calculate("age")
-
     for pe_region_name, region_name in region_to_target_name_map.items():
         for lower_age in range(0, 90, 10):
             upper_age = lower_age + 10
@@ -259,10 +258,10 @@ def get_loss_results(dataset, time_period, reform=None):
             "name": estimates.index,
             "estimate": estimates.values,
             "target": targets,
-        }
+        },
     )
     df["error"] = df["estimate"] - df["target"]
     df["abs_error"] = df["error"].abs()
     df["rel_error"] = df["error"] / df["target"]
     df["abs_rel_error"] = df["rel_error"].abs()
-    return df
+    return df.reset_index(drop=True)

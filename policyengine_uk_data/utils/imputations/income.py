@@ -60,6 +60,8 @@ def generate_spi_table(spi: pd.DataFrame):
 
     spi["employment_income"] = spi[["PAY", "EPB", "TAXTERM"]].sum(axis=1)
 
+    spi = spi[spi.TI > 500_000]
+
     return spi
 
 
