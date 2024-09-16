@@ -6,7 +6,7 @@ END_YEAR = 2034
 
 
 def create_policyengine_uprating_factors_table():
-    from policyengine_us.system import system
+    from policyengine_uk.system import system
 
     df = pd.DataFrame()
 
@@ -42,3 +42,19 @@ def create_policyengine_uprating_factors_table():
 
     df_growth.to_csv(STORAGE_FOLDER / "uprating_growth_factors.csv")
     return df
+
+
+def uprate_values(values, variable_name, start_year=2020, end_year=2034):
+    uprating_factors = pd.read_csv(STORAGE_FOLDER / "uprating_factors.csv")
+    uprating_factors = uprating_factors.set_index("Variable")
+    uprating_factors = uprating_factors.loc[variable_name]
+
+    initial_index = uprating_factors[str(start_year)]
+    end_index = uprating_factors[str(end_year)]
+    relative_change = end_index / initial_index
+
+    return values * relative_change
+
+
+if __name__ == "__main__":
+    create_policyengine_uprating_factors_table()
