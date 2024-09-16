@@ -12,7 +12,7 @@ from policyengine_uk_data.utils.imputations.capital_gains import (
 
 class EnhancedFRS(Dataset):
     def generate(self):
-        data = self.input_frs().load_dataset()
+        data = self.input_frs(require=True).load_dataset()
         original_weights = data["household_weight"][str(self.time_period)] + 10
         for year in range(self.time_period, self.end_year + 1):
             loss_matrix, targets_array = create_target_matrix(
@@ -100,5 +100,4 @@ def reweight(
 
 
 if __name__ == "__main__":
-    ReweightedFRS_2022_23().generate()
     EnhancedFRS_2022_23().generate()
