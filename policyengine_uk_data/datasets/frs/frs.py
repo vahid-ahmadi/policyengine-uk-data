@@ -112,6 +112,7 @@ class FRS_2022_23(FRS):
     label = "FRS (2022-23)"
     file_path = STORAGE_FOLDER / "frs_2022_23.h5"
     time_period = 2022
+    url = "release://PolicyEngine/ukda/frs_2022_23.h5"
 
 
 def add_id_variables(frs: h5py.File, person: DataFrame, household: DataFrame):
