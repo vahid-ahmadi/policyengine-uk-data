@@ -93,7 +93,7 @@ def impute_capital_gains(dataset, time_period: int):
         loss_value.backward()
         optimiser.step()
         progress.set_description(f"Loss: {loss_value.item()}")
-        if loss_value.item() < 1e-5:
+        if loss_value.item() < 1e-3:
             break
 
     new_household_weight = household_weight.detach().numpy()
