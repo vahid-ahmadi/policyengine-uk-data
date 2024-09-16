@@ -6,7 +6,7 @@ from requests.packages.urllib3.util.retry import Retry
 import time
 
 auth_headers = {
-    "Authorization": f"token {os.environ.get('POLICYENGINE_US_DATA_GITHUB_TOKEN')}",
+    "Authorization": f"token {os.environ.get('POLICYENGINE_UK_DATA_GITHUB_TOKEN')}",
 }
 
 

@@ -63,7 +63,7 @@ jobs:
       - name: Download data inputs
         run: make download
         env:
-          POLICYENGINE_US_DATA_GITHUB_TOKEN: ${{ secrets.POLICYENGINE_UK_DATA_GITHUB_TOKEN }}
+          POLICYENGINE_UK_DATA_GITHUB_TOKEN: ${{ secrets.POLICYENGINE_UK_DATA_GITHUB_TOKEN }}
       - name: Build datasets
         run: make data
       - name: Run tests
@@ -83,9 +83,9 @@ jobs:
           username: ${{github.actor}}
           password: ${{secrets.GITHUB_TOKEN}}
       - name: Build container
-        run: docker build . -f docker/policyengine_us_data.Dockerfile -t ghcr.io/policyengine/policyengine-us-data:latest
+        run: docker build . -f docker/policyengine_uk_data.Dockerfile -t ghcr.io/policyengine/policyengine-uk-data:latest
       - name: Push container
-        run: docker push ghcr.io/policyengine/policyengine-us-data:latest
+        run: docker push ghcr.io/policyengine/policyengine-uk-data:latest
 
   upload:
     name: Upload Data 
@@ -106,10 +106,10 @@ jobs:
       - name: Download data inputs
         run: make download
         env:
-          POLICYENGINE_US_DATA_GITHUB_TOKEN: ${{ secrets.POLICYENGINE_US_DATA_GITHUB_TOKEN }}
+          POLICYENGINE_UK_DATA_GITHUB_TOKEN: ${{ secrets.POLICYENGINE_UK_DATA_GITHUB_TOKEN }}
       - name: Build datasets
         run: make data
       - name: Upload data
         run: make upload
         env:
-          POLICYENGINE_US_DATA_GITHUB_TOKEN: ${{ secrets.POLICYENGINE_US_DATA_GITHUB_TOKEN }}
+          POLICYENGINE_UK_DATA_GITHUB_TOKEN: ${{ secrets.POLICYENGINE_UK_DATA_GITHUB_TOKEN }}
