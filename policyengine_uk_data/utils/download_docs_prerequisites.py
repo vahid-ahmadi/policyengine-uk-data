@@ -1,5 +1,5 @@
-from policyengine_us_data.utils.github import download
-from policyengine_us_data.data_storage import STORAGE_FOLDER
+from policyengine_uk_data.utils.github import download
+from policyengine_uk_data.data_storage import STORAGE_FOLDER
 
 PREREQUISITES = [
     {
