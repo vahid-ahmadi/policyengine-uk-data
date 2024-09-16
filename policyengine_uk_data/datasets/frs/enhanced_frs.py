@@ -5,6 +5,9 @@ from policyengine_uk_data.datasets.frs.extended_frs import ExtendedFRS_2022_23
 from policyengine_uk_data.datasets.frs.frs import FRS_2022_23
 from policyengine_uk_data.utils.loss import create_target_matrix
 import torch
+from policyengine_uk_data.utils.imputations.capital_gains import (
+    impute_cg_to_dataset,
+)
 
 
 class EnhancedFRS(Dataset):
@@ -21,6 +24,10 @@ class EnhancedFRS(Dataset):
             data["household_weight"][str(year)] = new_weights
 
         self.save_dataset(data)
+
+        # Capital gains imputation
+
+        impute_cg_to_dataset(self)
 
 
 class ReweightedFRS_2022_23(EnhancedFRS):

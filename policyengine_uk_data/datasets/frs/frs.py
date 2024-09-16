@@ -89,6 +89,10 @@ class FRS(Dataset):
 
         self.save_dataset(frs)
 
+        impute_brmas(self, frs)
+
+        self.save_dataset(frs)
+
 
 class FRS_2020_21(FRS):
     dwp_frs = DWP_FRS_2020_21
@@ -779,6 +783,57 @@ def add_expenses(
 
 def add_benunit_variables(frs: h5py.File, benunit: DataFrame):
     frs["benunit_rent"] = np.maximum(benunit.BURENT.fillna(0) * 52, 0)
+
+
+def impute_brmas(dataset, frs):
+    # Randomly select broad rental market areas from regions.
+    from policyengine_uk import Microsimulation
+
+    sim = Microsimulation(dataset=dataset)
+    region = (
+        sim.populations["benunit"]
+        .household("region", dataset.time_period)
+        .decode_to_str()
+    )
+    lha_category = sim.calculate("LHA_category")
+
+    brma = np.empty(len(region), dtype=object)
+
+    # Sample from a random BRMA in the region, weighted by the number of observations in each BRMA
+    lha_list_of_rents = pd.read_csv(
+        STORAGE_FOLDER / "lha_list_of_rents.csv.gz"
+    )
+    lha_list_of_rents = lha_list_of_rents.copy()
+
+    for possible_region in lha_list_of_rents.region.unique():
+        for possible_lha_category in lha_list_of_rents.lha_category.unique():
+            lor_mask = (lha_list_of_rents.region == possible_region) & (
+                lha_list_of_rents.lha_category == possible_lha_category
+            )
+            mask = (region == possible_region) & (
+                lha_category == possible_lha_category
+            )
+            brma[mask] = lha_list_of_rents[lor_mask].brma.sample(
+                n=len(region[mask]), replace=True
+            )
+
+    # Convert benunit-level BRMAs to household-level BRMAs (pick a random one)
+
+    df = pd.DataFrame(
+        {
+            "brma": brma,
+            "household_id": sim.populations["benunit"].household(
+                "household_id", 2023
+            ),
+        }
+    )
+
+    df = df.groupby("household_id").brma.aggregate(
+        lambda x: x.sample(n=1).iloc[0]
+    )
+    brmas = df[sim.calculate("household_id")].values
+
+    frs["brma"] = {dataset.time_period: brmas}
 
 
 if __name__ == "__main__":
