@@ -1,4 +1,6 @@
 import streamlit as st
+from policyengine_uk_data.utils.download_docs_prerequisites import download_data
+download_data()
 
 st.set_page_config(layout="wide")
 
