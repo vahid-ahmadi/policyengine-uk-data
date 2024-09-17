@@ -86,7 +86,7 @@ def impute_capital_gains(dataset, time_period: int):
         return loss
 
     optimiser = Adam([blend_factor], lr=1e-1)
-    progress = tqdm(range(1000))
+    progress = range(1000)
     for i in progress:
         optimiser.zero_grad()
         loss_value = loss(blend_factor)
