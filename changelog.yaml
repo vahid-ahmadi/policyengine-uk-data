@@ -8,3 +8,8 @@
     changed:
     - Lightened dependency list.
   date: 2024-09-17 18:05:27
+- bump: minor
+  changes:
+    fixed:
+    - Compatibility with PolicyEngine UK.
+  date: 2024-09-18 00:32:05

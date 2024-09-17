@@ -3,10 +3,8 @@ import numpy as np
 
 # Fit a spline to each income band's percentiles
 from scipy.interpolate import UnivariateSpline
-from policyengine_uk import Microsimulation
-from tqdm import tqdm
 from policyengine_uk_data.storage import STORAGE_FOLDER
-from policyengine_uk.system import system
+from tqdm import tqdm
 import copy
 
 import torch
@@ -23,6 +21,9 @@ capital_gains["maximum_total_income"] = (
 
 def impute_capital_gains(dataset, time_period: int):
     """Assumes that the capital gains distribution is the same for all years."""
+
+    from policyengine_uk import Microsimulation
+    from policyengine_uk.system import system
 
     sim = Microsimulation(dataset=dataset)
     ti = sim.calculate("total_income", time_period)
