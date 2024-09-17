@@ -5,7 +5,7 @@ from tqdm import tqdm
 FOLDER = Path(__file__).parent
 
 FILES = [
-    "cps_2022_23.h5",
+    "frs_2022_23.h5",
     "enhanced_frs_2022_23.h5",
     "extended_frs_2022_23.h5",
     "reweighted_frs_2022_23.h5",
