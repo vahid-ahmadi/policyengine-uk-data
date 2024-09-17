@@ -6,8 +6,10 @@
 **/*.csv
 **/*.zip
 **/*.pkl
+**/*.tab
 !uprating_factors.csv
 !uprating_growth_factors.csv
 !incomes.csv
 !tax_benefit.csv
 !demographics.csv
+**/_build

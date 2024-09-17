@@ -837,6 +837,4 @@ def impute_brmas(dataset, frs):
 
 
 if __name__ == "__main__":
-    FRS_2020_21().generate()
-    FRS_2021_22().generate()
     FRS_2022_23().generate()

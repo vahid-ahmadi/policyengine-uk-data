@@ -1,0 +1,5 @@
+format: jb-book
+root: intro
+chapters:
+- file: methodology.ipynb
+- file: validation.ipynb
