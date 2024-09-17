@@ -1,16 +1,5 @@
-import streamlit as st
-from policyengine_uk_data.utils.download_docs_prerequisites import (
-    download_data,
-)
+# Introduction
 
-download_data()
-
-st.set_page_config(layout="wide")
-
-st.title("PolicyEngine-UK-Data")
-
-st.write(
-    """
 PolicyEngine-UK-Data is a package that creates representative microdata for the UK, 
 designed for input in the PolicyEngine tax-benefit microsimulation model. This tool 
 allows users to explore the data sources, validation processes, and enhancements 
@@ -22,5 +11,4 @@ PolicyEngine is a tool with a clear purpose: for given assumptions about UK gove
 * An accurate representation of the current UK household sector *now*.
 
 This repository is dedicated to the second of those. In this documentation, we'll explain how we do that, but we'll also use our model (the first bullet) to see what we end up with when we combine the two, and measure up against other organisations doing the same thing.
-"""
-)
+

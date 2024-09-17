@@ -25,10 +25,11 @@ dev = [
     "black",
     "pytest",
     "policyengine_uk>=1.8.0",
-    "streamlit",
     "survey_enhance",
     "torch",
     "tables",
+    "furo",
+    "jupyter-book",
 ]
 
 [tool.setuptools]

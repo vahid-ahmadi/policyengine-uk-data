@@ -74,7 +74,7 @@ def upload(
             f"Asset {file_name} already exists in release {release_tag} of {org}/{repo}, skipping."
         )
         return
-    
+
     url = f"https://uploads.github.com/repos/{org}/{repo}/releases/{release_id}/assets?name={file_name}"
 
     headers = {
@@ -85,7 +85,7 @@ def upload(
 
     with open(file_path, "rb") as f:
         data = f.read()
-    
+
     response = requests.post(
         url,
         headers=headers,
@@ -96,9 +96,8 @@ def upload(
         raise ValueError(
             f"Invalid response code {response.status_code} for url {url}. Received: {response.text}"
         )
-    
-    return response.json()
 
+    return response.json()
 
 
 def set_pr_auto_review_comment(text: str):

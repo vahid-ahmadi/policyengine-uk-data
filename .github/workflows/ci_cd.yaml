@@ -30,6 +30,29 @@ jobs:
           user: __token__
           password: ${{ secrets.PYPI }}
           skip-existing: true
+  publish-docs:
+    name: Publish documentation
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch all history for all tags and branches
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+      - name: Install package
+        run: pip install -e ".[dev]"
+      - name: Build Jupyter Book
+        run: make documentation
+      - name: Deploy documentation
+        uses: JamesIves/github-pages-deploy-action@releases/v4
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: gh-pages
+          FOLDER: docs/_build/html
   lint:
     runs-on: ubuntu-latest
     name: Lint
@@ -47,7 +70,7 @@ jobs:
         run: black . -l 79 --check
 
   test:
-    name: Build and Test
+    name: Build and test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -68,6 +91,8 @@ jobs:
         run: make data
       - name: Run tests
         run: pytest
+      - name: Test documentation builds
+        run: make documentation
   check-version:
     name: Check version
     if: github.event_name == 'pull_request'
