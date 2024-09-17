@@ -39,6 +39,7 @@ def create_target_matrix(
     # First- tax-benefit outcomes from the DWP and OBR.
 
     from policyengine_uk import Microsimulation
+
     sim = Microsimulation(dataset=dataset, reform=reform)
     sim.default_calculation_period = time_period
 
@@ -248,6 +249,7 @@ def create_target_matrix(
 def get_loss_results(dataset, time_period, reform=None):
     matrix, targets = create_target_matrix(dataset, time_period, reform)
     from policyengine_uk import Microsimulation
+
     weights = (
         Microsimulation(dataset=dataset, reform=reform)
         .calculate("household_weight", time_period)

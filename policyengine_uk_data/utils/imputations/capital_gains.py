@@ -24,6 +24,7 @@ def impute_capital_gains(dataset, time_period: int):
 
     from policyengine_uk import Microsimulation
     from policyengine_uk.system import system
+
     sim = Microsimulation(dataset=dataset)
     ti = sim.calculate("total_income", time_period)
     household_weight = sim.calculate("household_weight", time_period).values
