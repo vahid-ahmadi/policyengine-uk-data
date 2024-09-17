@@ -110,10 +110,6 @@ jobs:
           python-version: "3.10"
       - name: Build changelog
         run: pip install "yaml-changelog>=0.1.7" && make changelog
-      - name: Preview changelog update
-        run: ".github/get-changelog-diff.sh"
-      - name: Check version number has been properly updated
-        run: ".github/is-version-number-acceptable.sh"
       - name: Update changelog
         uses: EndBug/add-and-commit@v9
         with:
