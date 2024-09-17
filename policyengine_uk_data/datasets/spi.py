@@ -1,5 +1,5 @@
 from policyengine_core.data import Dataset
-from policyengine_uk.data.storage import STORAGE_FOLDER
+from policyengine_uk_data.storage import STORAGE_FOLDER
 import pandas as pd
 import numpy as np
 
