@@ -5,7 +5,7 @@ import numpy as np
 import yaml
 from policyengine_uk_data.storage import STORAGE_FOLDER
 
-LCFS_TAB_FOLDER = Path("/Users/nikhilwoodruff/Downloads/UKDA-9123-tab/tab")
+LCFS_TAB_FOLDER = STORAGE_FOLDER / "lcfs_2021_22"
 
 REGIONS = {
     1: "NORTH_EAST",

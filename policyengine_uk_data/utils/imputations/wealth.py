@@ -5,7 +5,7 @@ import numpy as np
 import yaml
 from policyengine_uk_data.storage import STORAGE_FOLDER
 
-WAS_TAB_FOLDER = Path("/Users/nikhilwoodruff/Downloads/UKDA-7215-tab/tab")
+WAS_TAB_FOLDER = STORAGE_FOLDER / "was_2006_20"
 
 REGIONS = {
     1: "NORTH_EAST",

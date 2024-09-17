@@ -4,7 +4,7 @@ from pathlib import Path
 import numpy as np
 from policyengine_uk_data.storage import STORAGE_FOLDER
 
-ETB_TAB_FOLDER = Path("/Users/nikhilwoodruff/Downloads/UKDA-8856-tab/tab")
+ETB_TAB_FOLDER = STORAGE_FOLDER / "etb_1977_21"
 
 CONSUMPTION_PCT_REDUCED_RATE = 0.03  # From OBR's VAT page
 CURRENT_VAT_RATE = 0.2

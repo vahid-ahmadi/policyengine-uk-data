@@ -18,6 +18,8 @@ FILES = [
 ]
 
 for file in FILES:
+    if (FOLDER / file).exists():
+        continue
     download(
         "PolicyEngine",
         "ukda",

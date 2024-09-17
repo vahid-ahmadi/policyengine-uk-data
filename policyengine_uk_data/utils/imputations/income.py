@@ -4,7 +4,7 @@ from pathlib import Path
 import numpy as np
 from policyengine_uk_data.storage import STORAGE_FOLDER
 
-SPI_TAB_FOLDER = Path("/Users/nikhilwoodruff/Downloads/UKDA-9121-tab/tab")
+SPI_TAB_FOLDER = STORAGE_FOLDER / "spi_2020_21"
 SPI_RENAMES = dict(
     private_pension_income="PENSION",
     self_employment_income="PROFITS",
