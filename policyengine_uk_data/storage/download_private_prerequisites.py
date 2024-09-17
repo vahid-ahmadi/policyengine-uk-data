@@ -2,10 +2,12 @@ from policyengine_uk_data.utils.github import download
 from pathlib import Path
 import zipfile
 
+
 def extract_zipped_folder(folder):
     folder = Path(folder)
     with zipfile.ZipFile(folder, "r") as zip_ref:
         zip_ref.extractall(folder.parent)
+
 
 FOLDER = Path(__file__).parent
 
