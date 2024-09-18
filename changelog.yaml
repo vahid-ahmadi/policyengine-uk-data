@@ -13,3 +13,8 @@
     fixed:
     - Compatibility with PolicyEngine UK.
   date: 2024-09-18 00:32:05
+- bump: patch
+  changes:
+    fixed:
+    - Data download URLs.
+  date: 2024-09-18 10:05:45
