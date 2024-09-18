@@ -30,6 +30,7 @@ def generate_etb_table(etb: pd.DataFrame):
 
 def save_imputation_models():
     from survey_enhance.impute import Imputation
+
     vat = Imputation()
     etb = pd.read_csv(
         ETB_TAB_FOLDER / "householdv2_1977-2021.tab",
