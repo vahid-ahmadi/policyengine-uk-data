@@ -1,4 +1,3 @@
-from survey_enhance.impute import Imputation
 import pandas as pd
 from pathlib import Path
 import numpy as np
@@ -85,6 +84,8 @@ IMPUTATIONS = [
 
 
 def save_imputation_models():
+    from survey_enhance.impute import Imputation
+
     income = Imputation()
     spi = pd.read_csv(SPI_TAB_FOLDER / "put2021uk.tab", delimiter="\t")
     spi = generate_spi_table(spi)

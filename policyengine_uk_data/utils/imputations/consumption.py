@@ -1,4 +1,3 @@
-from survey_enhance.impute import Imputation
 import pandas as pd
 from pathlib import Path
 import numpy as np
@@ -133,6 +132,8 @@ def uprate_lcfs_table(
 
 
 def save_imputation_models():
+    from survey_enhance.impute import Imputation
+
     consumption = Imputation()
     lcfs_household = pd.read_csv(
         LCFS_TAB_FOLDER / "lcfs_2021_dvhh_ukanon.tab",

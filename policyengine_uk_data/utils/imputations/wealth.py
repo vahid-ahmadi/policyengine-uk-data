@@ -1,4 +1,3 @@
-from survey_enhance.impute import Imputation
 import pandas as pd
 from pathlib import Path
 import numpy as np
@@ -133,6 +132,8 @@ def generate_was_table(was: pd.DataFrame):
 
 
 def save_imputation_models():
+    from survey_enhance.impute import Imputation
+
     was = pd.read_csv(
         WAS_TAB_FOLDER / "was_round_7_hhold_eul_march_2022.tab",
         sep="\t",
