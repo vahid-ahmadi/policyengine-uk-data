@@ -3,14 +3,13 @@
 name: Push
 
 on:
-  workflow_run:
-    workflows: ["Update versioning"]
-    types: [completed]
+  push:
+    branches:
+      - main
 
 jobs:
   lint:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     name: Lint
     steps:
       - uses: actions/checkout@v4
@@ -27,7 +26,6 @@ jobs:
   test:
     name: Build and test
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -62,7 +60,6 @@ jobs:
   publish-to-pypi:
     name: Publish to PyPI
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -87,7 +84,6 @@ jobs:
   docker:
     name: Docker
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
