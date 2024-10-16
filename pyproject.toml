@@ -38,7 +38,7 @@ packages = ["policyengine_uk_data"]
 include-package-data = true
 
 [tool.setuptools.package-data]
-"policyengine_us_data" = ["**/*"]
+"policyengine_uk_data" = ["**/*"]
 
 [tool.pytest.ini_options]
 addopts = "-v"

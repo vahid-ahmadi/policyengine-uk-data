@@ -38,5 +38,5 @@ jobs:
           add: "."
           committer_name: Github Actions[bot]
           author_name: Github Actions[bot]
-          message: Update PolicyEngine US data
-          github_token: ${{ secrets.POLICYENGINE_US_DATA_GITHUB_TOKEN }}
+          message: Update PolicyEngine UK data
+          github_token: ${{ secrets.POLICYENGINE_UK_DATA_GITHUB_TOKEN }}
