@@ -81,19 +81,3 @@ jobs:
           user: __token__
           password: ${{ secrets.PYPI }}
           skip-existing: true
-  docker:
-    name: Docker
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-      - name: Log in to the Container registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{github.actor}}
-          password: ${{secrets.GITHUB_TOKEN}}
-      - name: Build container
-        run: docker build . -f docker/policyengine_uk_data.Dockerfile -t ghcr.io/policyengine/policyengine-uk-data:latest
-      - name: Push container
-        run: docker push ghcr.io/policyengine/policyengine-uk-data:latest
