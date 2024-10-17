@@ -56,7 +56,7 @@ class EnhancedFRS_2022_23(EnhancedFRS):
     input_frs = ExtendedFRS_2022_23
     time_period = 2022
     end_year = 2028
-    url = "release://PolicyEngine/ukda/1.4.0/enhanced_frs_2022_23.h5"
+    url = "release://PolicyEngine/ukda/1.5.0/enhanced_frs_2022_23.h5"
 
 
 def reweight(
@@ -104,7 +104,7 @@ def reweight(
 
     start_loss = None
 
-    iterator = trange(1_000)
+    iterator = trange(10_000)
     for i in iterator:
         optimizer.zero_grad()
         weights_ = dropout_weights(weights, dropout_rate)
