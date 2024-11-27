@@ -1,4 +1,4 @@
-from policyengine_uk_data.utils.github import download
+from policyengine_uk_data.utils.huggingface import download, upload
 from pathlib import Path
 import zipfile
 
@@ -6,7 +6,7 @@ import zipfile
 def extract_zipped_folder(folder):
     folder = Path(folder)
     with zipfile.ZipFile(folder, "r") as zip_ref:
-        zip_ref.extractall(folder.parent)
+        zip_ref.extractall(folder.parent / folder.stem)
 
 
 FOLDER = Path(__file__).parent
@@ -19,15 +19,14 @@ FILES = [
     "spi_2020_21.zip",
 ]
 
+FILES = [FOLDER / file for file in FILES]
+
 for file in FILES:
-    if (FOLDER / file).exists():
-        continue
     download(
-        "PolicyEngine",
-        "ukda",
-        "release",
-        file,
-        FOLDER / file,
+        repo="policyengine/policyengine-uk-data",
+        repo_filename=file.name,
+        local_folder=file.parent,
     )
-    extract_zipped_folder(FOLDER / file)
-    (FOLDER / file).unlink()
+    print(f"Extracting {file}")
+    extract_zipped_folder(file)
+    file.unlink()
