@@ -75,3 +75,8 @@
     fixed:
     - Bug removing capital gains.
   date: 2024-10-22 11:18:48
+- bump: patch
+  changes:
+    added:
+    - Automatic calibration.
+  date: 2024-11-27 19:28:29

@@ -39,6 +39,8 @@ jobs:
         run: make install
       - name: Download data inputs
         run: make download
+        env:
+          HUGGING_FACE_TOKEN: ${{ secrets.HUGGING_FACE_TOKEN }}
       - name: Build datasets
         run: make data
       - name: Run tests
